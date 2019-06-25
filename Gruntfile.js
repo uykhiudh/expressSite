@@ -2,8 +2,7 @@ module.exports = function (grunt) {
     // 加载插件
     [
         'grunt-cafe-mocha',
-        'grunt-contrib-jshint',
-        'grunt-exec'
+        'grunt-contrib-jshint','grunt-exec'
     ].forEach(function (task) {
         grunt.loadNpmTasks(task);
     });
