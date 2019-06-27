@@ -1,4 +1,18 @@
 <h1>About Meadowlark Travel</h1>
 
 <p>Your fortune for the day:</p>
-<blockquote>{{fortune}}</blockquote>
+{{#if fortune}}
+    <blockquote>{{fortune}}</blockquote>
+{{/if}}
+{{#if message}}
+    <p>{{message}}</p>
+{{/if}}
+{{#if style}}
+    <p>{{style}}</p>
+{{/if}}
+{{#if userid}}
+    <p>{{userid}}</p>
+{{/if}}
+{{#if username}}
+    <p>{{username}}</p>
+{{/if}}
