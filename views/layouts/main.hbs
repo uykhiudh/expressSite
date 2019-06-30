@@ -1,30 +1,17 @@
 <!doctype html>
 <html>
 <head>
-    {{{_sections.head}}}
     <link rel="shortcut icon" href="/img/favicon.ico">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
-	<title>Meadowlark Travel</title>
+	<title>Meadowlark Travel hbs</title>
     {{#if showTests}}
         <link rel="stylesheet" href="/vendor/mocha.css">
     {{/if}}
     <script src="//code.jquery.com/jquery-2.0.2.min.js"></script>
 </head>
 <body>
-<div class="container">
-    <header>
-        <h1>Meadowlark Travel</h1>
-        <img src="/img/logo.svg" alt="Meadowlark Travel Logo" width="300">
-    </header>
+<header><img src="/img/logo.svg" alt="Meadowlark Travel Logo" width="300"></header>
 
-    {{{body}}}
-
-    <footer>
-        &copy; {{copyrightYear}} Meadowlark Travel
-    </footer>
-</div>
-
-{{{_sections.jquery}}}
+{{{body}}}
 
 {{#if showTests}}
     <div id="mocha"></div>

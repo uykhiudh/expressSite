@@ -2,7 +2,19 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var handlebars = require('express-handlebars')
-    .create({defaultLayout:'main'});
+    .create({
+        defaultLayout:'main',
+        helpers:{
+            section:function (name, options) {
+                if (!this._sections) {
+                    this._sections = {};
+                }
+                this._sections[name] = options.fn(this);
+                return null;
+            }
+        }
+        /*,extname:'.hbs'*/
+    });
 
 var fortune = require('./lib/fortune');
 
@@ -20,6 +32,47 @@ app.use(function (req,res,next){
     next();
 });
 
+
+// 获取当前天气数据
+function getWeatherData(){
+    return {
+        locations:[
+            {
+                name:'Portland',
+                forecastUrl:'http://www.wunderground.com/US/OR/Portland.html',
+                iconUrl:'https://icons.wxug.com/i/c/v4/29.svg',
+                weather:'Overcast',
+                temp:'54.1 F (12.3 C)'
+            },
+            {
+                name:'Bend',
+                forecastUrl:'http://www.wunderground.com/US/OR/Bend.html',
+                iconUrl:'https://icons.wxug.com/i/c/v4/32.svg',
+                weather:'Partly Cloudy',
+                temp:'55.1 F (12.8 C)'
+            },
+            {
+                name:'Manzanita',
+                forecastUrl:'http://www.wunderground.com/US/OR/Manzanita.html',
+                iconUrl:'https://icons.wxug.com/i/c/v4/34.svg',
+                weather:'Light Rain',
+                temp:'55.0 F (12.8 C)'
+            }
+        ]
+    }
+}
+
+app.use(function (req, res, next) {
+    // res.locals 是每一个布局的数据
+    if(!res.locals.partials){
+        res.locals.partials = {};
+    }
+    // partials下面参数名字不能与局部文件的名字一样
+    // res.locals.partials.weather = getWeatherData();
+    res.locals.partials.weatherData = getWeatherData();
+    next();
+});
+
 app.use(bodyParser.json());
 // 创建 application/x-www-form-urlencoded 编码解析
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -27,7 +80,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // app.use(express.favicon(__dirname+'/public/img/favicon.ico'));
 
 app.get('/',function (req, res) {
-	res.render('home');
+    res.render('home');
 });
 
 app.get('/about',function (req, res) {
@@ -65,6 +118,26 @@ app.get('/greeting',function (req, res) {
     });
 });
 
+// 段落section
+app.get('/jquerytest',function (req, res) {
+    res.render('jquerytest');
+});
+
+// 客户端handlebars
+app.get('/nursery-rhyme',function (req, res) {
+    res.render('nursery-rhyme');
+});
+
+app.get('/data/nursery-rhyme',function (req, res) {
+    res.json({
+        animal:'squirrel',
+        bodyPart:'tail',
+        adjective:'bushy',
+        noun:'heck'
+    });
+});
+
+
 app.post('/process-contact',function (req, res) {
     console.log(req.body);
     console.log('Received contact from ' + req.body.name + ' <' + req.body.email + '>');
@@ -81,6 +154,27 @@ app.get('/thank-you',function (req, res) {
     // res.render('thank-you');
 });
 
+app.get('/product-list',function (rea, res) {
+    res.render('product-list',{
+        currency:{
+            name:'United States dollars',
+            abbrev:'USD'
+        },
+        tours:[
+            {
+                name:'Hood River',
+                price:'$99.95'
+            },
+            {
+                name:'Oregon Coast',
+                price:'$159.95'
+            }
+        ],
+        specialsUrl:'/january-specials',
+        currencies:['USD','GBP','BTC']
+    });
+});
+
 // lauout 没有布局文件
 app.get('/no-layout',function (req, res) {
     res.render('no-layout',{
@@ -90,7 +184,16 @@ app.get('/no-layout',function (req, res) {
 
 app.get('/test',function (req, res) {
     res.type('text/plain').send('this is a test');
-})
+});
+
+app.get('/foo',function (res, res) {
+    res.render('foo',{
+        // 不用默认的布局了 lauout为null的时候不使用布局
+        // layout:null
+        layout:'microsite'
+    });
+});
+
 
 // 200以外的响应吗
 app.get('/error',function (req, res) {
@@ -104,7 +207,6 @@ app.get('/error',function (req, res) {
 app.use(function (req, res) {
     res.status(404).render('404');
 });
-
 
 
 // 定制500页面
