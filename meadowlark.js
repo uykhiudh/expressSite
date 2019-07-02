@@ -16,6 +16,9 @@ var handlebars = require('express-handlebars')
         /*,extname:'.hbs'*/
     });
 
+// 文件上传需要
+var formidable = require('formidable');
+
 var fortune = require('./lib/fortune');
 
 
@@ -73,6 +76,7 @@ app.use(function (req, res, next) {
     next();
 });
 
+// app.use(bodyParser());
 app.use(bodyParser.json());
 // 创建 application/x-www-form-urlencoded 编码解析
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -82,6 +86,55 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.get('/',function (req, res) {
     res.render('home');
 });
+
+app.get('/newsletter',function (req, res) {
+    res.render('newsletter',{
+        csrf:'CSRF token goes here'
+    });
+});
+
+app.post('/process',function (req, res) {
+    // console.log('Form (from queryString): ' + req.query.form);
+    // console.log('CSRF token (from hidden form field): ' + req.body._csrf);
+    // console.log('Name (from visible form field): ' + req.body.name);
+    // console.log('Email (from visible form field): ' + req.body.email);
+    // res.redirect(303,'/thank-you');
+    console.log(req.accepts('html'));
+    console.log(req.accepts('json,html'));
+    if (req.xhr || req.accepts('json,html') === 'json') {
+        // 如果发生错误，应该发送{error:'error description'}
+        res.send({success:true});
+    }else {
+        // 如果发生错误，应该重定向到错误页面
+        res.redirect(303,'/thank-you');
+    }
+});
+
+
+// 文件上传
+app.get('/contest/vacation-photo',function (req, res) {
+    var now = new Date();
+    res.render('contest/vacation-photo',{
+        year:now.getFullYear(),
+        month:now.getMonth()
+    });
+});
+app.post('/contest/vacation-photo/:year/:month',function (req, res) {
+    var form = new formidable.IncomingForm();
+    form.parse(req,function (err, fields, files) {
+        if(err){
+            return res.redirect(303,'/error');
+        }
+        console.log('received fields');
+        console.log(fields);
+        console.log('received files');
+        console.log(files);
+        res.redirect(303,'/thank-you');
+    });
+});
+
+
+
 
 app.get('/about',function (req, res) {
     res.render('about',{
